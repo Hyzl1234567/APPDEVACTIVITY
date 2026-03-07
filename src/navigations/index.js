@@ -3,9 +3,12 @@ import { useEffect } from 'react';
 import { Platform, StatusBar, useColorScheme } from 'react-native';
 
 import AuthNav from './AuthNav';
+import MainNav from './MainNav';
+import { useSelector } from 'react-redux';
 
 export default () => {
   const isDarkMode = useColorScheme() === 'dark';
+  const { data } = useSelector(state => state.auth);
 
   useEffect(() => {
     if (Platform.OS === 'android') {
@@ -15,9 +18,13 @@ export default () => {
     StatusBar.setBarStyle('dark-content', true);
   }, [isDarkMode]);
 
+  console.log('TEST: ', JSON.stringify(data, null, 2));
+
+  let isLoggedIn = !!data;
+
   return (
     <NavigationContainer>
-      <AuthNav />
+      {isLoggedIn ? <MainNav /> : <AuthNav />}
     </NavigationContainer>
   );
 };

@@ -3,8 +3,12 @@ import React from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 import { IMG, ROUTES } from '../utils';
 
+import { useDispatch } from 'react-redux';
+import { resetLogin } from '../app/reducers/auth';
+
 const HomeScreen = () => {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
   return (
     <View
       style={{
@@ -27,7 +31,7 @@ const HomeScreen = () => {
 
       <TouchableOpacity
         onPress={() => {
-          navigation.navigate(ROUTES.PROFILE);
+          dispatch(resetLogin());
         }}
       >
         <View
@@ -37,9 +41,7 @@ const HomeScreen = () => {
             borderRadius: 20,
           }}
         >
-          <Text style={{ fontSize: 40, color: 'white' }}>
-            GO TO PROFILE SCREEN
-          </Text>
+          <Text style={{ fontSize: 40, color: 'white' }}>LOGOUT</Text>
         </View>
       </TouchableOpacity>
     </View>

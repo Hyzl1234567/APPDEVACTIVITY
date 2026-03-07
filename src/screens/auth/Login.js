@@ -1,3 +1,5 @@
+import { useDispatch, useSelector } from 'react-redux';
+import { userLogin } from '../../app/reducers/auth';
 import React, { useState } from 'react';
 import { 
   Alert, 
@@ -14,18 +16,29 @@ import {
 } from 'react-native';
 
 const Login = ({navigation}) => {
+const dispatch = useDispatch();
+const authState = useSelector(state => state.auth);
+
   const [emailAdd, setEmailAdd] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [focusedInput, setFocusedInput] = useState(null);
 
   const handleLogin = () => {
-    if (!emailAdd || !password) {
-      Alert.alert('Missing Information', 'Please enter both username and password.');
-      return;
-    }
-    Alert.alert('Login Attempt', `Username: ${emailAdd}`);
-  };
+  console.log("LOGIN BUTTON PRESSED");
+
+  if (!emailAdd || !password) {
+    Alert.alert('Missing Information', 'Please enter both username and password.');
+    return;
+  }
+
+  dispatch(
+    userLogin({
+      username: emailAdd,
+      password: password,
+    })
+  );
+};
 
   return (
     <>
@@ -95,7 +108,7 @@ const Login = ({navigation}) => {
                   onPress={() => setShowPassword(!showPassword)}
                   style={styles.eyeIcon}
                 >
-                  <Text style={styles.eyeText}>{showPassword ? '👁️' : '🙈'}</Text>
+                  <Text style={styles.eyeText}>{showPassword ? '😶‍🌫️' : '👁️'}</Text>
                 </TouchableOpacity>
               </View>
             </View>

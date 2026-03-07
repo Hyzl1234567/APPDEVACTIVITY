@@ -1,0 +1,8 @@
+{
+    "require": {
+        "api-platform/api-pack": "^1.4"
+    },
+    "require-dev": {
+        "symfony/maker-bundle": "^1.66"
+    }
+}
