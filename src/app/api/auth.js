@@ -1,21 +1,30 @@
-const BASE_URL = 'http://192.168.2.7:8000/api';
-const options = {
+const BASE_URL = 'http://10.101.152.204:8000/api';
+ const options = {
   headers: {
     Accept: 'application/json',
     'Content-Type': 'application/json',
   },
 };
 
-export async function authLogin({ student_id, password }) {
+export async function authLogin({ username, password }) {
+
+  console.log("LOGIN PAYLOAD:", { username, password });
+
   const response = await fetch(BASE_URL + '/login', {
     method: 'POST',
-    ...options,
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
     body: JSON.stringify({
-      student_id,
+      username,
       password,
     }),
   });
+
   const data = await response.json();
+
+  console.log("SERVER RESPONSE:", data);
 
   if (response.ok) {
     return data;
