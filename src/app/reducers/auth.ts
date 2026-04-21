@@ -6,13 +6,19 @@ import {
   USER_LOGIN_RESET,
 } from '../actions';
 
-const INITIAL_STATE = {
+interface AuthState {
+  data: any;
+  isLoading: boolean;
+  isError: boolean;
+}
+
+const INITIAL_STATE: AuthState = {
   data: null,
   isLoading: false,
   isError: false,
 };
 
-export default function reducer(state = INITIAL_STATE, action) {
+export default function reducer(state: AuthState = INITIAL_STATE, action: any): AuthState {
   console.log(action.type);
   switch (action.type) {
     case USER_LOGIN_REQUEST:
@@ -46,12 +52,11 @@ export default function reducer(state = INITIAL_STATE, action) {
   }
 }
 
-export const userLogin = payload => ({
+export const userLogin = (payload: any) => ({
   type: USER_LOGIN,
   payload,
 });
 
-
 export const resetLogin = () => ({
-  type: USER_LOGIN_RESET
+  type: USER_LOGIN_RESET,
 });

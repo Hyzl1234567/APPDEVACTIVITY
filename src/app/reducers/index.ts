@@ -1,5 +1,5 @@
-import { applyMiddleware, combineReducers, createStore } from 'redux';
-import { persistReducer, persistStore } from 'redux-persist';
+import { applyMiddleware, combineReducers, createStore, Store } from 'redux';
+import { persistReducer, persistStore, Persistor } from 'redux-persist';
 import createSagaMiddleware from 'redux-saga';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -26,7 +26,7 @@ const rootReducer = combineReducers({
 
 const persistedReducer = persistReducer(rootPersistConfig, rootReducer);
 
-export default () => {
+export default (): { store: Store; persistor: Persistor; runSaga: (saga: any) => any } => {
   let store = createStore(persistedReducer, applyMiddleware(sagaMiddleware));
 
   let persistor = persistStore(store);

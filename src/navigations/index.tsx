@@ -1,14 +1,20 @@
+import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { useEffect } from 'react';
 import { Platform, StatusBar, useColorScheme } from 'react-native';
+import { useSelector } from 'react-redux';
 
 import AuthNav from './AuthNav';
 import MainNav from './MainNav';
-import { useSelector } from 'react-redux';
 
-export default () => {
+interface AuthState {
+  auth: {
+    data: any;
+  };
+}
+
+const Navigation: React.FC = () => {
   const isDarkMode = useColorScheme() === 'dark';
-  const { data } = useSelector(state => state.auth);
+  const { data } = useSelector((state: AuthState) => state.auth);
 
   useEffect(() => {
     if (Platform.OS === 'android') {
@@ -28,3 +34,5 @@ export default () => {
     </NavigationContainer>
   );
 };
+
+export default Navigation;

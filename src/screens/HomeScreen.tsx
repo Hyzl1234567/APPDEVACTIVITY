@@ -6,9 +6,14 @@ import { IMG, ROUTES } from '../utils';
 import { useDispatch } from 'react-redux';
 import { resetLogin } from '../app/reducers/auth';
 
-const HomeScreen = () => {
-  const navigation = useNavigation();
+interface NavigationProps {
+  navigate: (screen: string) => void;
+}
+
+const HomeScreen: React.FC = () => {
+  const navigation = useNavigation<NavigationProps>();
   const dispatch = useDispatch();
+  
   return (
     <View
       style={{
@@ -45,6 +50,8 @@ const HomeScreen = () => {
         </View>
       </TouchableOpacity>
     </View>
+
+    
   );
 };
 
