@@ -1,7 +1,8 @@
+import React from 'react';
 import { Image, Text, View } from 'react-native';
 import { IMG } from '../utils';
 
-const ProfileScreen = () => {
+const ErrorScreen: React.FC = () => {
   return (
     <View
       style={{
@@ -21,9 +22,9 @@ const ProfileScreen = () => {
           height: 200,
         }}
       />
-      <Text>ProfileScreen</Text>
+      <Text>ErrorScreen</Text>
     </View>
   );
 };
 
-export default ProfileScreen;
+export default ErrorScreen;

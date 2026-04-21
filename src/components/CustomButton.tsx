@@ -1,12 +1,23 @@
+import React from 'react';
 import {
   ActivityIndicator,
   Dimensions,
   Text,
   TouchableOpacity,
   View,
+  ViewStyle,
+  TextStyle,
 } from 'react-native';
 
-const CustomButton = ({
+interface CustomButtonProps {
+  containerStyle?: ViewStyle;
+  label: string;
+  textStyle?: TextStyle;
+  onPress: () => void;
+  loading?: boolean;
+}
+
+const CustomButton: React.FC<CustomButtonProps> = ({
   containerStyle,
   label,
   textStyle,
@@ -18,7 +29,7 @@ const CustomButton = ({
   return (
     <>
       {loading ? (
-        <View className="h-20 p-4">
+        <View style={{ height: 80, padding: 16 }}>
           <ActivityIndicator size={'large'} color={'blue'} />
         </View>
       ) : (

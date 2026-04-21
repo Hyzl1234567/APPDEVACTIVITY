@@ -1,6 +1,6 @@
-import { useDispatch, useSelector } from 'react-redux';
-import { userLogin } from '../../app/reducers/auth';
 import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { USER_REGISTER } from '../../app/actions';
 import { 
   Alert, 
   Text, 
@@ -12,33 +12,50 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  StatusBar
+  StatusBar,
 } from 'react-native';
 
-const Login = ({navigation}) => {
-const dispatch = useDispatch();
-const authState = useSelector(state => state.auth);
-
-  const [emailAdd, setEmailAdd] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [focusedInput, setFocusedInput] = useState(null);
-
-  const handleLogin = () => {
-  console.log("LOGIN BUTTON PRESSED");
-
-  if (!emailAdd || !password) {
-    Alert.alert('Missing Information', 'Please enter both username and password.');
-    return;
-  }
-
-  dispatch(
-    userLogin({
-      username: emailAdd,
-      password: password,
-    })
-  );
+type RegisterScreenNavigationProp = {
+  navigate: (screen: string) => void;
 };
+
+interface RegisterProps {
+  navigation: RegisterScreenNavigationProp;
+}
+
+const Register: React.FC<RegisterProps> = ({ navigation }) => {
+
+  const dispatch = useDispatch();
+  
+  const [username, setUsername] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [confirmPassword, setConfirmPassword] = useState<string>('');
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [focusedInput, setFocusedInput] = useState<string | null>(null);
+
+  const handleRegister = (): void => {
+    if (!username || !email || !password || !confirmPassword) {
+      Alert.alert('Missing Information', 'Please fill in all fields.');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      Alert.alert('Password Mismatch', 'Passwords do not match.');
+      return;
+    }
+
+    console.log('REGISTER BUTTON PRESSED');
+
+    dispatch({
+      type: USER_REGISTER,
+      payload: {
+        username,
+        email,
+        password,
+      },
+    });
+  };
 
   return (
     <>
@@ -51,40 +68,61 @@ const authState = useSelector(state => state.auth);
           contentContainerStyle={styles.scrollContainer}
           keyboardShouldPersistTaps="handled"
         >
-          {/* Header Section with Logo */}
+          {/* Header */}
           <View style={styles.headerSection}>
             <View style={styles.logoContainer}>
               <Text style={styles.logoEmoji}>☕</Text>
             </View>
-              <Text style={styles.subtitleText}>Nature in Every Cup</Text>
-            <Text style={styles.welcomeText}>Welcome Back!</Text>
+            <Text style={styles.subtitleText}>Nature in Every Cup</Text>
+            <Text style={styles.welcomeText}>Create Account</Text>
           </View>
 
-          {/* Form Section */}
+          {/* Form */}
           <View style={styles.formSection}>
-            {/* Username Input */}
+            {/* Username */}
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Username</Text>
               <View style={[
                 styles.inputContainer,
-                focusedInput === 'email' && styles.inputContainerFocused
+                focusedInput === 'username' && styles.inputContainerFocused
               ]}>
                 <Text style={styles.inputIcon}>👤</Text>
                 <TextInput
                   style={styles.input}
                   placeholder="Enter your username"
                   placeholderTextColor="#999"
-                  value={emailAdd}
-                  onChangeText={setEmailAdd}
-                  onFocus={() => setFocusedInput('email')}
+                  value={username}
+                  onChangeText={setUsername}
+                  onFocus={() => setFocusedInput('username')}
                   onBlur={() => setFocusedInput(null)}
                   autoCapitalize="none"
-                  autoCorrect={false}
                 />
               </View>
             </View>
 
-            {/* Password Input */}
+            {/* Email */}
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Email</Text>
+              <View style={[
+                styles.inputContainer,
+                focusedInput === 'email' && styles.inputContainerFocused
+              ]}>
+                <Text style={styles.inputIcon}>📧</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Enter your email"
+                  placeholderTextColor="#999"
+                  value={email}
+                  onChangeText={setEmail}
+                  onFocus={() => setFocusedInput('email')}
+                  onBlur={() => setFocusedInput(null)}
+                  autoCapitalize="none"
+                  keyboardType="email-address"
+                />
+              </View>
+            </View>
+
+            {/* Password */}
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Password</Text>
               <View style={[
@@ -102,56 +140,58 @@ const authState = useSelector(state => state.auth);
                   onBlur={() => setFocusedInput(null)}
                   secureTextEntry={!showPassword}
                   autoCapitalize="none"
-                  autoCorrect={false}
                 />
                 <TouchableOpacity
                   onPress={() => setShowPassword(!showPassword)}
                   style={styles.eyeIcon}
                 >
-                  <Text style={styles.eyeText}>{showPassword ? '😶‍🌫️' : '👁️'}</Text>
+                  <Text style={styles.eyeText}>{showPassword ? '👁️' : '🙈'}</Text>
                 </TouchableOpacity>
               </View>
             </View>
 
-            {/* Remember Me & Forgot Password */}
-            <View style={styles.optionsRow}>
-              <TouchableOpacity style={styles.rememberMeContainer}>
-                <Text style={styles.checkbox}>☑️</Text>
-                <Text style={styles.rememberMeText}>Remember me</Text>
-              </TouchableOpacity>
-              <TouchableOpacity>
-                <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
-              </TouchableOpacity>
+            {/* Confirm Password */}
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Confirm Password</Text>
+              <View style={[
+                styles.inputContainer,
+                focusedInput === 'confirmPassword' && styles.inputContainerFocused
+              ]}>
+                <Text style={styles.inputIcon}>🔒</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Confirm your password"
+                  placeholderTextColor="#999"
+                  value={confirmPassword}
+                  onChangeText={setConfirmPassword}
+                  onFocus={() => setFocusedInput('confirmPassword')}
+                  onBlur={() => setFocusedInput(null)}
+                  secureTextEntry={!showPassword}
+                  autoCapitalize="none"
+                />
+              </View>
             </View>
 
-            {/* Login Button */}
+            {/* Register Button */}
             <TouchableOpacity
-              style={styles.loginButton}
-              onPress={handleLogin}
+              style={styles.registerButton}
+              onPress={handleRegister}
               activeOpacity={0.8}
             >
-              <Text style={styles.loginButtonText}>LOGIN</Text>
+              <Text style={styles.registerButtonText}>SIGN UP</Text>
               <Text style={styles.buttonIcon}>→</Text>
             </TouchableOpacity>
 
-            {/* Divider */}
-            <View style={styles.divider}>
-              <View style={styles.dividerLine} />
-              <Text style={styles.dividerText}>OR</Text>
-              <View style={styles.dividerLine} />
-            </View>
-
-            {/* Register Link */}
-            <View style={styles.registerContainer}>
-              <Text style={styles.registerText}>Don't have an account? </Text>
-               <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-    <Text style={styles.registerLink}>Sign Up</Text>
-  </TouchableOpacity>
+            {/* Login Link */}
+            <View style={styles.loginContainer}>
+              <Text style={styles.loginText}>Already have an account? </Text>
+              <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+                <Text style={styles.loginLink}>Login</Text>
+              </TouchableOpacity>
             </View>
           </View>
 
-          {/* Footer */}
-          <Text style={styles.footerText}>© 2026 EcoBrew Ordering System</Text>
+          <Text style={styles.footerText}>© 2024 EcoBrew Ordering System</Text>
         </ScrollView>
       </KeyboardAvoidingView>
     </>
@@ -170,16 +210,16 @@ const styles = StyleSheet.create({
   },
   headerSection: {
     alignItems: 'center',
-    marginBottom: 40,
+    marginBottom: 30,
   },
   logoContainer: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
     backgroundColor: '#1D4A23',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 15,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
@@ -187,10 +227,10 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   logoEmoji: {
-    fontSize: 60,
+    fontSize: 50,
   },
   welcomeText: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: 'bold',
     color: '#1D4A23',
     marginBottom: 5,
@@ -198,7 +238,6 @@ const styles = StyleSheet.create({
   subtitleText: {
     fontSize: 14,
     color: '#666',
-    textAlign: 'center',
   },
   formSection: {
     backgroundColor: '#99CC67',
@@ -211,7 +250,7 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   inputGroup: {
-    marginBottom: 20,
+    marginBottom: 15,
   },
   label: {
     fontSize: 14,
@@ -249,43 +288,21 @@ const styles = StyleSheet.create({
   eyeText: {
     fontSize: 20,
   },
-  optionsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 25,
-  },
-  rememberMeContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  checkbox: {
-    fontSize: 18,
-    marginRight: 5,
-  },
-  rememberMeText: {
-    fontSize: 14,
-    color: '#666',
-  },
-  forgotPasswordText: {
-    fontSize: 14,
-    color: '#99CC67',
-    fontWeight: '600',
-  },
-  loginButton: {
+  registerButton: {
     backgroundColor: '#1D4A23',
     borderRadius: 12,
     height: 55,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+    marginTop: 10,
     shadowColor: '#1D4A23',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 5,
   },
-  loginButtonText: {
+  registerButtonText: {
     color: '#FFF',
     fontSize: 16,
     fontWeight: 'bold',
@@ -296,32 +313,17 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontSize: 20,
   },
-  divider: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 25,
-  },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: '#E0E0E0',
-  },
-  dividerText: {
-    marginHorizontal: 15,
-    color: '#999',
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  registerContainer: {
+  loginContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+    marginTop: 20,
   },
-  registerText: {
+  loginText: {
     fontSize: 14,
     color: '#666',
   },
-  registerLink: {
+  loginLink: {
     fontSize: 14,
     color: '#1D4A23',
     fontWeight: 'bold',
@@ -334,4 +336,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Login;
+export default Register;
