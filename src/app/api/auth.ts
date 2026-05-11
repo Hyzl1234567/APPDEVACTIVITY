@@ -1,6 +1,7 @@
-const BASE_URL: string = 'http://192.168.101.11:8000/api';
+// api/auth.ts
+export const BASE_URL: string = 'http://192.168.101.21:8000/api';
 
-const options: { headers: { Accept: string; 'Content-Type': string; } } = {
+const options: { headers: { Accept: string; 'Content-Type': string } } = {
   headers: {
     Accept: 'application/json',
     'Content-Type': 'application/json',
@@ -18,8 +19,15 @@ interface RegisterParams {
   password: string;
 }
 
+interface GoogleLoginParams {
+  idToken: string;
+  email: string;
+  name: string;
+  photo: string;
+}
+
 export async function authLogin(params: LoginParams): Promise<any> {
-  console.log("LOGIN PAYLOAD:", params);
+  console.log('LOGIN PAYLOAD:', params);
 
   const response = await fetch(BASE_URL + '/login', {
     method: 'POST',
@@ -31,8 +39,7 @@ export async function authLogin(params: LoginParams): Promise<any> {
   });
 
   const data = await response.json();
-
-  console.log("SERVER RESPONSE:", data);
+  console.log('SERVER RESPONSE:', data);
 
   if (response.ok) {
     return data;
@@ -55,5 +62,24 @@ export async function authRegister(params: RegisterParams): Promise<any> {
     return data;
   } else {
     throw new Error(data.message || 'Registration failed');
+  }
+}
+
+export async function authGoogleLogin(params: GoogleLoginParams): Promise<any> {
+  console.log('GOOGLE LOGIN PAYLOAD:', params);
+
+  const response = await fetch(BASE_URL + '/auth/google', {
+    method: 'POST',
+    ...options,
+    body: JSON.stringify(params),
+  });
+
+  const data = await response.json();
+  console.log('GOOGLE LOGIN RESPONSE:', data);
+
+  if (response.ok) {
+    return data;
+  } else {
+    throw new Error(data.message || 'Google login failed');
   }
 }

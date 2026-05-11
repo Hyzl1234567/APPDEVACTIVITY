@@ -1,10 +1,12 @@
 import { useNavigation } from '@react-navigation/native';
-import React from 'react';
-import { Image, Text, TouchableOpacity, View } from 'react-native';
-import { IMG, ROUTES } from '../utils';
-
+import React, { useEffect, useState } from 'react';
+import { Image, Text, View } from 'react-native';
+import { IMG } from '../utils';
 import { useDispatch } from 'react-redux';
-import { resetLogin } from '../app/reducers/auth';
+import { resetLogin } from '../app/actions';
+import { getAnalytics, logEvent } from '@react-native-firebase/analytics';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import CustomButton from '../components/CustomButton';
 
 interface NavigationProps {
   navigate: (screen: string) => void;
@@ -13,7 +15,33 @@ interface NavigationProps {
 const HomeScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProps>();
   const dispatch = useDispatch();
-  
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  useEffect(() => {
+    const logAnalytics = async () => {
+      try {
+        const analyticsInstance = getAnalytics();
+        await logEvent(analyticsInstance, 'app_open');
+        console.log('Analytics event logged!');
+      } catch (error) {
+        console.log('Analytics error:', error);
+      }
+    };
+    logAnalytics();
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      setIsLoggingOut(true);
+      await GoogleSignin.signOut();
+      dispatch(resetLogin());
+    } catch (error) {
+      console.log('Logout error:', error);
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
+
   return (
     <View
       style={{
@@ -25,7 +53,6 @@ const HomeScreen: React.FC = () => {
       <Image
         source={{
           uri: IMG.LOGO,
-          // uri: 'https://www.chachinggroup.com/blog/wp-content/uploads/2016/07/logo-design-in-Thailand.jpg',
         }}
         style={{
           width: 200,
@@ -34,24 +61,14 @@ const HomeScreen: React.FC = () => {
       />
       <Text>HomeScreen</Text>
 
-      <TouchableOpacity
-        onPress={() => {
-          dispatch(resetLogin());
-        }}
-      >
-        <View
-          style={{
-            padding: 20,
-            backgroundColor: 'green',
-            borderRadius: 20,
-          }}
-        >
-          <Text style={{ fontSize: 40, color: 'white' }}>LOGOUT</Text>
-        </View>
-      </TouchableOpacity>
+      <CustomButton
+        label="LOGOUT"
+        backgroundColor="green"
+        onPress={handleLogout}
+        loading={isLoggingOut}
+        disabled={isLoggingOut}
+      />
     </View>
-
-    
   );
 };
 

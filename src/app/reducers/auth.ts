@@ -1,62 +1,60 @@
+// app/reducers/auth.ts
 import {
   USER_LOGIN,
+  USER_LOGIN_REQUEST,
   USER_LOGIN_COMPLETED,
   USER_LOGIN_ERROR,
-  USER_LOGIN_REQUEST,
   USER_LOGIN_RESET,
+  GOOGLE_LOGIN,
+  GOOGLE_LOGIN_REQUEST,
+  GOOGLE_LOGIN_COMPLETED,
+  GOOGLE_LOGIN_ERROR,
 } from '../actions';
 
 interface AuthState {
-  data: any;
-  isLoading: boolean;
-  isError: boolean;
+  data: any | null;
+  loading: boolean;
+  error: string | null;
 }
 
-const INITIAL_STATE: AuthState = {
+const initialState: AuthState = {
   data: null,
-  isLoading: false,
-  isError: false,
+  loading: false,
+  error: null,
 };
 
-export default function reducer(state: AuthState = INITIAL_STATE, action: any): AuthState {
-  console.log(action.type);
-  switch (action.type) {
+export default (state = initialState, action: any) => {
+  const { type, payload } = action;
+  switch (type) {
+    case USER_LOGIN:
+      return { ...state, data: null, error: null, loading: false };
+    
     case USER_LOGIN_REQUEST:
-      return {
-        ...state,
-        data: null,
-        isLoading: true,
-        isError: false,
-      };
-
+      return { ...state, loading: true, error: null };
+    
     case USER_LOGIN_COMPLETED:
-      return {
-        ...state,
-        data: action.payload,
-        isLoading: false,
-        isError: false,
-      };
-
+      return { ...state, loading: false, data: payload, error: null };
+    
     case USER_LOGIN_ERROR:
-      return {
-        data: null,
-        isLoading: false,
-        isError: true,
-      };
+      return { ...state, loading: false, error: payload };
+
+    case GOOGLE_LOGIN:
+      return { ...state, data: null, error: null, loading: false };
+    
+    case GOOGLE_LOGIN_REQUEST:
+      return { ...state, loading: true, error: null };
+    
+    case GOOGLE_LOGIN_COMPLETED:
+      console.log('🔵 REDUCER: GOOGLE_LOGIN_COMPLETED with payload:', payload);
+      return { ...state, loading: false, data: payload, error: null };
+    
+    case GOOGLE_LOGIN_ERROR:
+      return { ...state, loading: false, error: payload };
 
     case USER_LOGIN_RESET:
-      return INITIAL_STATE;
+      return initialState;
 
     default:
       return state;
   }
-}
-
-export const userLogin = (payload: any) => ({
-  type: USER_LOGIN,
-  payload,
-});
-
-export const resetLogin = () => ({
-  type: USER_LOGIN_RESET,
-});
+};
