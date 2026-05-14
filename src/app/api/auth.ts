@@ -1,4 +1,5 @@
-// api/auth.ts
+// src/app/api/auth.ts
+
 export const BASE_URL: string = 'http://192.168.101.21:8000/api';
 
 const options: { headers: { Accept: string; 'Content-Type': string } } = {
@@ -7,6 +8,8 @@ const options: { headers: { Accept: string; 'Content-Type': string } } = {
     'Content-Type': 'application/json',
   },
 };
+
+// ─── Interfaces ───────────────────────────────────────────────────────────────
 
 interface LoginParams {
   username: string;
@@ -26,6 +29,8 @@ interface GoogleLoginParams {
   photo: string;
 }
 
+// ─── Auth ─────────────────────────────────────────────────────────────────────
+
 export async function authLogin(params: LoginParams): Promise<any> {
   console.log('LOGIN PAYLOAD:', params);
 
@@ -38,13 +43,15 @@ export async function authLogin(params: LoginParams): Promise<any> {
     body: JSON.stringify(params),
   });
 
-  const data = await response.json();
-  console.log('SERVER RESPONSE:', data);
+  const raw = await response.text();
+  console.log('SERVER RESPONSE:', raw.substring(0, 300));
 
-  if (response.ok) {
-    return data;
-  } else {
-    throw new Error(data.message || 'Login failed');
+  try {
+    const data = JSON.parse(raw);
+    if (response.ok) return data;
+    throw new Error(data.message || data.error || 'Login failed');
+  } catch {
+    throw new Error(`Login failed (status ${response.status})`);
   }
 }
 
@@ -55,13 +62,15 @@ export async function authRegister(params: RegisterParams): Promise<any> {
     body: JSON.stringify(params),
   });
 
-  const data = await response.json();
-  console.log('REGISTER RESPONSE:', data);
+  const raw = await response.text();
+  console.log('REGISTER RESPONSE:', raw.substring(0, 300));
 
-  if (response.ok) {
-    return data;
-  } else {
-    throw new Error(data.message || 'Registration failed');
+  try {
+    const data = JSON.parse(raw);
+    if (response.ok) return data;
+    throw new Error(data.message || data.error || 'Registration failed');
+  } catch {
+    throw new Error(`Registration failed (status ${response.status})`);
   }
 }
 
@@ -74,12 +83,55 @@ export async function authGoogleLogin(params: GoogleLoginParams): Promise<any> {
     body: JSON.stringify(params),
   });
 
-  const data = await response.json();
-  console.log('GOOGLE LOGIN RESPONSE:', data);
+  const raw = await response.text();
+  console.log('GOOGLE LOGIN STATUS:', response.status);
+  console.log('GOOGLE LOGIN RESPONSE:', raw.substring(0, 300));
 
-  if (response.ok) {
-    return data;
-  } else {
-    throw new Error(data.message || 'Google login failed');
+  try {
+    const data = JSON.parse(raw);
+    if (response.ok) return data;
+    throw new Error(data.message || data.error || 'Google login failed');
+  } catch {
+    throw new Error(`Google login failed (status ${response.status})`);
+  }
+}
+
+// ─── Products ─────────────────────────────────────────────────────────────────
+
+export async function getProducts(categoryId?: number): Promise<any> {
+  const url = categoryId
+    ? `${BASE_URL}/products?category=${categoryId}`
+    : `${BASE_URL}/products`;
+
+  const response = await fetch(url, {
+    method: 'GET',
+    ...options,
+  });
+
+  const raw = await response.text();
+
+  try {
+    const data = JSON.parse(raw);
+    if (response.ok) return data;
+    throw new Error(data.message || data.error || 'Failed to fetch products');
+  } catch {
+    throw new Error(`Failed to fetch products (status ${response.status})`);
+  }
+}
+
+export async function getCategories(): Promise<any> {
+  const response = await fetch(`${BASE_URL}/categories`, {
+    method: 'GET',
+    ...options,
+  });
+
+  const raw = await response.text();
+
+  try {
+    const data = JSON.parse(raw);
+    if (response.ok) return data;
+    throw new Error(data.message || data.error || 'Failed to fetch categories');
+  } catch {
+    throw new Error(`Failed to fetch categories (status ${response.status})`);
   }
 }
